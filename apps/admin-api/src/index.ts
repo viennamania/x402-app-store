@@ -5,7 +5,9 @@ import { createApp } from "./app.js";
 const env = loadAdminApiEnv();
 const app = createApp();
 
-void connectToMongo(env.MONGODB_URI)
+void connectToMongo(env.MONGODB_URI, {
+  dbName: env.MONGODB_DB_NAME
+})
   .then(() => {
     console.log("[admin-api] Mongo connection ready");
   })

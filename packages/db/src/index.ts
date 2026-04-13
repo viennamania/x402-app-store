@@ -14,9 +14,16 @@ declare global {
   var __x402_mongo__: Promise<typeof mongoose> | undefined;
 }
 
-export function connectToMongo(mongoUri: string) {
+export function connectToMongo(
+  mongoUri: string,
+  options?: {
+    dbName?: string;
+  }
+) {
   if (!global.__x402_mongo__) {
-    global.__x402_mongo__ = mongoose.connect(mongoUri);
+    global.__x402_mongo__ = mongoose.connect(mongoUri, {
+      dbName: options?.dbName
+    });
   }
 
   return global.__x402_mongo__;

@@ -14,7 +14,9 @@ import { processWithdrawalSubmit } from "./processors/withdrawal-submit.js";
 const env = loadWorkerEnv();
 const queues = createPlatformQueues(env.REDIS_URL);
 
-void connectToMongo(env.MONGODB_URI)
+void connectToMongo(env.MONGODB_URI, {
+  dbName: env.MONGODB_DB_NAME
+})
   .then(() => {
     console.log("[worker] Mongo connection ready");
   })
