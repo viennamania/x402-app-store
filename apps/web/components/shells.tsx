@@ -1,28 +1,28 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import type { Dictionary, Locale } from "@/lib/i18n";
 
-const storeNav = [
-  { href: "/store", label: "Store" },
-  { href: "/wallet", label: "Wallet" },
-  { href: "/rewards", label: "Rewards" },
-  { href: "/history", label: "History" }
-];
+type ShellProps = {
+  children: ReactNode;
+  dictionary: Dictionary;
+  locale: Locale;
+};
 
-const adminNav = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/apps", label: "Apps" },
-  { href: "/admin/campaigns", label: "Campaigns" },
-  { href: "/admin/payouts", label: "Payouts" },
-  { href: "/admin/fraud", label: "Fraud" }
-];
+export function AppShell({ children, dictionary, locale }: ShellProps) {
+  const storeNav = [
+    { href: "/store", label: dictionary.nav.store },
+    { href: "/wallet", label: dictionary.nav.wallet },
+    { href: "/rewards", label: dictionary.nav.rewards },
+    { href: "/history", label: dictionary.nav.history }
+  ];
 
-export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="shell-frame">
       <header className="topbar">
         <Link className="brandmark" href="/">
           X402
-          <span>Reward app store</span>
+          <span>{dictionary.brand.storefront}</span>
         </Link>
         <nav className="topnav">
           {storeNav.map((item) => (
@@ -31,8 +31,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
           <Link className="ghost-pill" href="/admin">
-            Admin
+            {dictionary.nav.admin}
           </Link>
+          <LocaleSwitcher
+            label={dictionary.language.label}
+            locale={locale}
+            options={dictionary.language.options}
+          />
         </nav>
       </header>
       <main className="page-shell">{children}</main>
@@ -40,13 +45,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function AdminShell({ children }: { children: ReactNode }) {
+export function AdminShell({ children, dictionary, locale }: ShellProps) {
+  const adminNav = [
+    { href: "/admin", label: dictionary.nav.overview },
+    { href: "/admin/apps", label: dictionary.nav.apps },
+    { href: "/admin/campaigns", label: dictionary.nav.campaigns },
+    { href: "/admin/payouts", label: dictionary.nav.payouts },
+    { href: "/admin/fraud", label: dictionary.nav.fraud }
+  ];
+
   return (
     <div className="shell-frame admin-frame">
       <header className="topbar">
         <Link className="brandmark" href="/admin">
           X402 Ops
-          <span>Reward engine control plane</span>
+          <span>{dictionary.brand.controlPlane}</span>
         </Link>
         <nav className="topnav">
           {adminNav.map((item) => (
@@ -55,8 +68,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
           <Link className="ghost-pill" href="/store">
-            Storefront
+            {dictionary.nav.storefront}
           </Link>
+          <LocaleSwitcher
+            label={dictionary.language.label}
+            locale={locale}
+            options={dictionary.language.options}
+          />
         </nav>
       </header>
       <main className="page-shell">{children}</main>

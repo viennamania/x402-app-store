@@ -1,14 +1,18 @@
 import { SectionHeading, ShellCard } from "@repo/ui";
-import { walletSummary } from "@/lib/mock-data";
+import { getRequestDictionary } from "@/lib/i18n";
+import { getWalletSummary } from "@/lib/mock-data";
 import { formatReward } from "@/lib/formatters";
 
-export default function HistoryPage() {
+export default async function HistoryPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const walletSummary = getWalletSummary(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="History"
-        title="Auditability matters more than decoration once money moves."
-        description="This timeline keeps reward and withdrawal traces explicit so a real ledger-backed history view can slot in later with minimal UI churn."
+        eyebrow={dictionary.history.eyebrow}
+        title={dictionary.history.title}
+        description={dictionary.history.description}
       />
       <ShellCard>
         {walletSummary.recentMovements.map((movement) => (
@@ -18,8 +22,14 @@ export default function HistoryPage() {
               <span className="mini-label">{movement.createdAt}</span>
             </div>
             <div className="stack">
-              <strong>{formatReward(movement.amount)}</strong>
-              <span className="mini-label">{movement.status}</span>
+              <strong>{formatReward(movement.amount, locale)}</strong>
+              <span className="mini-label">
+                {
+                  dictionary.taxonomy.movementStatuses[
+                    movement.status as keyof typeof dictionary.taxonomy.movementStatuses
+                  ] ?? movement.status
+                }
+              </span>
             </div>
           </div>
         ))}

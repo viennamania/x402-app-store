@@ -1,13 +1,17 @@
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
-import { fraudQueue } from "@/lib/mock-data";
+import { getRequestDictionary } from "@/lib/i18n";
+import { getFraudQueue } from "@/lib/mock-data";
 
-export default function AdminFraudPage() {
+export default async function AdminFraudPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const fraudQueue = getFraudQueue(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Fraud"
-        title="Abuse review exists before withdrawals finalize."
-        description="This queue is deliberately first-class in the scaffold because reward systems fail when fraud arrives after payout."
+        eyebrow={dictionary.adminFraud.eyebrow}
+        title={dictionary.adminFraud.title}
+        description={dictionary.adminFraud.description}
       />
       <ShellCard>
         {fraudQueue.map((item) => (
@@ -15,7 +19,11 @@ export default function AdminFraudPage() {
             <div className="stack">
               <div className="chip-row">
                 <Pill tone={item.severity === "high" ? "warning" : "default"}>
-                  {item.severity}
+                  {
+                    dictionary.taxonomy.fraudSeverity[
+                      item.severity as keyof typeof dictionary.taxonomy.fraudSeverity
+                    ] ?? item.severity
+                  }
                 </Pill>
               </div>
               <strong>{item.missionSessionId}</strong>
@@ -23,7 +31,7 @@ export default function AdminFraudPage() {
             </div>
             <div className="stack">
               <strong>{item.score}</strong>
-              <span className="mini-label">risk score</span>
+              <span className="mini-label">{dictionary.adminFraud.riskScore}</span>
             </div>
           </div>
         ))}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { getRequestDictionary, getRequestLocale } from "@/lib/i18n";
 import "./globals.css";
 
 const displayFont = Space_Grotesk({
@@ -14,19 +15,24 @@ const monoFont = IBM_Plex_Mono({
   weight: ["400", "500", "600"]
 });
 
-export const metadata: Metadata = {
-  title: "X402 App Store",
-  description:
-    "Production-minded MVP scaffold for a USDT reward app store with queue-first rewards and wallet-native UX."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { dictionary } = await getRequestDictionary();
 
-export default function RootLayout({
+  return {
+    title: dictionary.metadata.title,
+    description: dictionary.metadata.description
+  };
+}
+
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale} data-locale={locale}>
       <body className={`${displayFont.variable} ${monoFont.variable}`}>
         <Providers>{children}</Providers>
       </body>

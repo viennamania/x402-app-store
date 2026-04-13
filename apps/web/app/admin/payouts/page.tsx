@@ -1,14 +1,17 @@
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
+import { getRequestDictionary } from "@/lib/i18n";
 import { payoutQueue } from "@/lib/mock-data";
 import { formatReward } from "@/lib/formatters";
 
-export default function AdminPayoutsPage() {
+export default async function AdminPayoutsPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Payouts"
-        title="Withdrawal handling is staged, visible, and intentionally boring."
-        description="Operators should see where a payout sits without needing to infer whether funds were already committed."
+        eyebrow={dictionary.adminPayouts.eyebrow}
+        title={dictionary.adminPayouts.title}
+        description={dictionary.adminPayouts.description}
       />
       <ShellCard>
         {payoutQueue.map((movement) => (
@@ -16,14 +19,18 @@ export default function AdminPayoutsPage() {
             <div className="stack">
               <div className="chip-row">
                 <Pill tone={movement.status === "submitted" ? "success" : "warning"}>
-                  {movement.status}
+                  {
+                    dictionary.taxonomy.movementStatuses[
+                      movement.status as keyof typeof dictionary.taxonomy.movementStatuses
+                    ] ?? movement.status
+                  }
                 </Pill>
               </div>
               <strong>{movement.requestId}</strong>
               <p className="detail-copy">{movement.walletAddress}</p>
             </div>
             <div className="stack">
-              <strong>{formatReward(movement.amount)}</strong>
+              <strong>{formatReward(movement.amount, locale)}</strong>
               <span className="mini-label">{movement.createdAt}</span>
             </div>
           </div>

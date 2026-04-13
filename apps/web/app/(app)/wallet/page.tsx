@@ -1,51 +1,59 @@
 import { MetricCard, SectionHeading, ShellCard } from "@repo/ui";
+import { getRequestDictionary } from "@/lib/i18n";
 import { WithdrawalForm } from "@/components/withdrawal-form";
 import { WalletConnectPanel } from "@/components/wallet-connect-panel";
 import { formatReward } from "@/lib/formatters";
-import { walletSummary } from "@/lib/mock-data";
+import { getWalletSummary } from "@/lib/mock-data";
 
-export default function WalletPage() {
+export default async function WalletPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const walletSummary = getWalletSummary(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Wallet"
-        title="Balance projections stay fast; settlement stays controlled."
-        description="The wallet surface shows derived balances for speed, but the ledger and worker pipeline remain the financial source of truth."
+        eyebrow={dictionary.wallet.eyebrow}
+        title={dictionary.wallet.title}
+        description={dictionary.wallet.description}
       />
 
       <section className="metric-grid">
         <MetricCard
-          label="Available"
-          value={formatReward(walletSummary.available.amount)}
-          note="Ready for verified payout requests"
+          label={dictionary.wallet.available}
+          value={formatReward(walletSummary.available.amount, locale)}
+          note={dictionary.wallet.availableNote}
         />
         <MetricCard
-          label="Pending"
-          value={formatReward(walletSummary.pending.amount)}
-          note="Awaiting verification or settlement"
+          label={dictionary.wallet.pending}
+          value={formatReward(walletSummary.pending.amount, locale)}
+          note={dictionary.wallet.pendingNote}
         />
         <MetricCard
-          label="Lifetime earned"
-          value={formatReward(walletSummary.lifetimeEarned.amount)}
-          note="Ledger-derived history"
+          label={dictionary.wallet.lifetimeEarned}
+          value={formatReward(walletSummary.lifetimeEarned.amount, locale)}
+          note={dictionary.wallet.lifetimeEarnedNote}
         />
         <MetricCard
-          label="Payout ETA"
+          label={dictionary.wallet.payoutEta}
           value={walletSummary.nextPayoutEta}
-          note="Operational SLA"
+          note={dictionary.wallet.payoutEtaNote}
         />
       </section>
 
       <section className="two-column">
-        <WalletConnectPanel />
-        <WithdrawalForm maxAmount={walletSummary.available.amount} />
+        <WalletConnectPanel copy={dictionary.walletConnect} />
+        <WithdrawalForm
+          copy={dictionary.withdrawals}
+          locale={locale}
+          maxAmount={walletSummary.available.amount}
+        />
       </section>
 
       <section className="stack">
         <SectionHeading
-          eyebrow="Movement History"
-          title="Recent wallet movements"
-          description="Movements represent payout requests and confirmations, separate from reward credits in the ledger."
+          eyebrow={dictionary.wallet.movementEyebrow}
+          title={dictionary.wallet.movementTitle}
+          description={dictionary.wallet.movementDescription}
         />
         <ShellCard>
           {walletSummary.recentMovements.map((movement) => (
@@ -55,8 +63,14 @@ export default function WalletPage() {
                 <p className="detail-copy">{movement.walletAddress}</p>
               </div>
               <div className="stack">
-                <strong>{formatReward(movement.amount)}</strong>
-                <span className="mini-label">{movement.status}</span>
+                <strong>{formatReward(movement.amount, locale)}</strong>
+                <span className="mini-label">
+                  {
+                    dictionary.taxonomy.movementStatuses[
+                      movement.status as keyof typeof dictionary.taxonomy.movementStatuses
+                    ] ?? movement.status
+                  }
+                </span>
               </div>
             </div>
           ))}

@@ -1,9 +1,8 @@
 import { loadAdminApiEnv } from "@repo/config";
 import { connectToMongo } from "@repo/db";
-import { createApp } from "./app.js";
+import app from "./server.js";
 
 const env = loadAdminApiEnv();
-const app = createApp();
 
 void connectToMongo(env.MONGODB_URI, {
   dbName: env.MONGODB_DB_NAME
@@ -15,6 +14,10 @@ void connectToMongo(env.MONGODB_URI, {
     console.warn("[admin-api] Mongo connection skipped", error);
   });
 
-app.listen(env.ADMIN_API_PORT, () => {
-  console.log(`[admin-api] listening on :${env.ADMIN_API_PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(env.ADMIN_API_PORT, () => {
+    console.log(`[admin-api] listening on :${env.ADMIN_API_PORT}`);
+  });
+}
+
+export default app;

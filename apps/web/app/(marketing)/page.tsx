@@ -6,40 +6,50 @@ import {
   SectionHeading,
   ShellCard
 } from "@repo/ui";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { getRequestDictionary } from "@/lib/i18n";
 import {
   adminOverview,
-  architectureSignals,
-  storefrontApps,
-  walletSummary
+  getArchitectureSignals,
+  getStorefrontApps,
+  getWalletSummary
 } from "@/lib/mock-data";
-import { compact, formatReward } from "@/lib/formatters";
+import { formatCompact, formatReward } from "@/lib/formatters";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const architectureSignals = getArchitectureSignals(locale);
+  const storefrontApps = getStorefrontApps(locale);
+  const walletSummary = getWalletSummary(locale);
+
   return (
     <div className="page-shell">
+      <div className="page-toolbar">
+        <LocaleSwitcher
+          label={dictionary.language.label}
+          locale={locale}
+          options={dictionary.language.options}
+        />
+      </div>
       <section className="hero-grid">
         <div className="hero-panel accent-panel">
-          <p className="section-eyebrow">Product Brief</p>
-          <h1>Reward discovery that feels like an app store, not an ad wall.</h1>
-          <p className="hero-copy">
-            X402 is a USDT reward app marketplace where discovery, mission
-            completion, and payout settlement live in one controlled product
-            loop.
-          </p>
+          <p className="section-eyebrow">{dictionary.landing.eyebrow}</p>
+          <h1>{dictionary.landing.title}</h1>
+          <p className="hero-copy">{dictionary.landing.description}</p>
           <div className="hero-actions">
             <Link className="primary-link" href="/store">
-              Open Store
+              {dictionary.landing.primaryCta}
             </Link>
             <Link className="secondary-link" href="/admin">
-              Review Ops Surface
+              {dictionary.landing.secondaryCta}
             </Link>
           </div>
         </div>
         <ShellCard>
           <SectionHeading
-            eyebrow="Why this scaffold"
-            title="Built around queue-first rewards and server-owned balances."
-            description="The web app handles browsing and wallet UX; the admin API and workers own verification, credits, withdrawals, and fraud review."
+            eyebrow={dictionary.landing.scaffoldEyebrow}
+            title={dictionary.landing.scaffoldTitle}
+            description={dictionary.landing.scaffoldDescription}
           />
           <div className="chip-row">
             <Pill tone="success">Next.js App Router</Pill>
@@ -58,41 +68,48 @@ export default function LandingPage() {
 
       <section className="metric-grid">
         <MetricCard
-          label="Featured apps"
+          label={dictionary.landing.metricFeaturedApps}
           value={String(storefrontApps.filter((entry) => entry.app.featured).length)}
-          note="Store pages wired first"
+          note={dictionary.landing.metricFeaturedAppsNote}
         />
         <MetricCard
-          label="Available balance"
-          value={formatReward(walletSummary.available.amount)}
-          note="Projection, not source of truth"
+          label={dictionary.landing.metricAvailableBalance}
+          value={formatReward(walletSummary.available.amount, locale)}
+          note={dictionary.landing.metricAvailableBalanceNote}
         />
         <MetricCard
-          label="Reward velocity"
-          value={formatReward(adminOverview.rewardVelocity24h)}
-          note="24h payout volume"
+          label={dictionary.landing.metricRewardVelocity}
+          value={formatReward(adminOverview.rewardVelocity24h, locale)}
+          note={dictionary.landing.metricRewardVelocityNote}
         />
         <MetricCard
-          label="Install reach"
-          value={compact.format(
-            storefrontApps.reduce((total, entry) => total + entry.app.installCount, 0)
+          label={dictionary.landing.metricInstallReach}
+          value={formatCompact(
+            storefrontApps.reduce((total, entry) => total + entry.app.installCount, 0),
+            locale
           )}
-          note="Top-of-funnel inventory"
+          note={dictionary.landing.metricInstallReachNote}
         />
       </section>
 
       <section className="split-grid">
         <ShellCard>
           <SectionHeading
-            eyebrow="Storefront"
-            title="The first user-facing loop is already mapped."
-            description="Browse featured apps, open mission detail, connect a wallet, and queue a withdrawal request through thin proxy routes."
+            eyebrow={dictionary.landing.storefrontEyebrow}
+            title={dictionary.landing.storefrontTitle}
+            description={dictionary.landing.storefrontDescription}
           />
           <div className="timeline">
             {storefrontApps.slice(0, 2).map((entry) => (
               <div className="timeline-step" key={entry.app.id}>
                 <div className="chip-row">
-                  <Pill>{entry.app.category}</Pill>
+                  <Pill>
+                    {
+                      dictionary.taxonomy.categories[
+                        entry.app.category as keyof typeof dictionary.taxonomy.categories
+                      ]
+                    }
+                  </Pill>
                   <Pill tone="success">{entry.app.rewardRange}</Pill>
                 </div>
                 <h3 className="card-title">{entry.app.name}</h3>
@@ -103,15 +120,21 @@ export default function LandingPage() {
         </ShellCard>
         <ShellCard>
           <SectionHeading
-            eyebrow="Control Plane"
-            title="Admin views mirror the backend split."
-            description="Campaigns, payouts, fraud queues, and ledger surfaces sit behind a dedicated internal API and worker runtime."
+            eyebrow={dictionary.landing.controlPlaneEyebrow}
+            title={dictionary.landing.controlPlaneTitle}
+            description={dictionary.landing.controlPlaneDescription}
           />
           <div className="stack">
-            <InfoStrip label="Queued verifications" value={String(adminOverview.queuedVerifications)} />
-            <InfoStrip label="Pending payouts" value={String(adminOverview.pendingPayouts)} />
             <InfoStrip
-              label="Reserve coverage"
+              label={dictionary.landing.queuedVerifications}
+              value={String(adminOverview.queuedVerifications)}
+            />
+            <InfoStrip
+              label={dictionary.landing.pendingPayouts}
+              value={String(adminOverview.pendingPayouts)}
+            />
+            <InfoStrip
+              label={dictionary.landing.reserveCoverage}
               value={`${adminOverview.reserveCoverageRatio.toFixed(2)}x`}
             />
           </div>

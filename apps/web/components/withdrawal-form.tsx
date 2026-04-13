@@ -2,11 +2,22 @@
 
 import { useState } from "react";
 import { ShellCard } from "@repo/ui";
+import type { Dictionary, Locale } from "@/lib/i18n";
 import { formatReward } from "@/lib/formatters";
 
-export function WithdrawalForm({ maxAmount }: { maxAmount: number }) {
+type WithdrawalStatus = keyof Dictionary["withdrawals"]["status"];
+
+export function WithdrawalForm({
+  maxAmount,
+  copy,
+  locale
+}: {
+  maxAmount: number;
+  copy: Dictionary["withdrawals"];
+  locale: Locale;
+}) {
   const [amount, setAmount] = useState(Math.min(25, maxAmount));
-  const [status, setStatus] = useState("idle");
+  const [status, setStatus] = useState<WithdrawalStatus>("idle");
 
   async function submitWithdrawal() {
     setStatus("submitting");
@@ -30,15 +41,12 @@ export function WithdrawalForm({ maxAmount }: { maxAmount: number }) {
   return (
     <ShellCard>
       <div className="stack">
-        <p className="section-eyebrow">Withdrawals</p>
-        <h3>Queue payout requests, do not execute them inline.</h3>
-        <p className="muted-copy">
-          Every request enters verification, submission, and confirmation
-          stages before final settlement.
-        </p>
+        <p className="section-eyebrow">{copy.eyebrow}</p>
+        <h3>{copy.title}</h3>
+        <p className="muted-copy">{copy.description}</p>
       </div>
       <label className="field">
-        <span>Amount</span>
+        <span>{copy.amount}</span>
         <input
           max={maxAmount}
           min={5}
@@ -49,11 +57,11 @@ export function WithdrawalForm({ maxAmount }: { maxAmount: number }) {
         />
       </label>
       <button className="primary-button" onClick={() => void submitWithdrawal()}>
-        Request {formatReward(amount)}
+        {copy.request} {formatReward(amount, locale)}
       </button>
       <div className="sync-status">
-        <span>Pipeline status</span>
-        <strong>{status}</strong>
+        <span>{copy.pipelineStatus}</span>
+        <strong>{copy.status[status]}</strong>
       </div>
     </ShellCard>
   );

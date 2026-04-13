@@ -1,21 +1,26 @@
 import { SectionHeading, ShellCard } from "@repo/ui";
-import { campaigns, storefrontApps } from "@/lib/mock-data";
+import { getRequestDictionary } from "@/lib/i18n";
+import { getCampaigns, getStorefrontApps } from "@/lib/mock-data";
 import { formatReward } from "@/lib/formatters";
 
-export default function RewardsPage() {
+export default async function RewardsPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const storefrontApps = getStorefrontApps(locale);
+  const campaigns = getCampaigns(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Rewards"
-        title="The reward surface explains earning capacity without hiding the risk controls."
-        description="Campaign budgets, mission payouts, and worker gating are visible together so the economics remain legible."
+        eyebrow={dictionary.rewards.eyebrow}
+        title={dictionary.rewards.title}
+        description={dictionary.rewards.description}
       />
 
       <section className="split-grid">
         <ShellCard>
           <div className="stack">
-            <p className="section-eyebrow">Reward Streams</p>
-            <h3 className="card-title">Active payout inventory</h3>
+            <p className="section-eyebrow">{dictionary.rewards.streamsEyebrow}</p>
+            <h3 className="card-title">{dictionary.rewards.streamsTitle}</h3>
           </div>
           <div className="timeline">
             {storefrontApps.map((entry) => (
@@ -28,15 +33,16 @@ export default function RewardsPage() {
         </ShellCard>
         <ShellCard>
           <div className="stack">
-            <p className="section-eyebrow">Campaign Budgets</p>
-            <h3 className="card-title">Daily burn remains observable</h3>
+            <p className="section-eyebrow">{dictionary.rewards.budgetsEyebrow}</p>
+            <h3 className="card-title">{dictionary.rewards.budgetsTitle}</h3>
           </div>
           <div className="timeline">
             {campaigns.map((campaign) => (
               <div className="timeline-step" key={campaign.id}>
                 <strong>{campaign.name}</strong>
                 <p className="detail-copy">
-                  {formatReward(campaign.dailyBudget.amount)} daily budget
+                  {formatReward(campaign.dailyBudget.amount, locale)}{" "}
+                  {dictionary.rewards.dailyBudgetSuffix}
                 </p>
               </div>
             ))}

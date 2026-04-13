@@ -1,6 +1,7 @@
 {
   "extends": "../../tooling/typescript/node.json",
   "include": [
+    "api/**/*.ts",
     "src/**/*.ts"
   ]
 }

@@ -1,41 +1,45 @@
 import { MetricCard, SectionHeading, ShellCard } from "@repo/ui";
-import { adminOverview, architectureSignals } from "@/lib/mock-data";
+import { getRequestDictionary } from "@/lib/i18n";
+import { adminOverview, getArchitectureSignals } from "@/lib/mock-data";
 import { formatReward } from "@/lib/formatters";
 
-export default function AdminOverviewPage() {
+export default async function AdminOverviewPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const architectureSignals = getArchitectureSignals(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Overview"
-        title="The control plane is shaped around risk and payout throughput."
-        description="This admin surface is intentionally close to the domain model: queues, campaigns, payouts, fraud, and reserve health."
+        eyebrow={dictionary.adminOverview.eyebrow}
+        title={dictionary.adminOverview.title}
+        description={dictionary.adminOverview.description}
       />
       <section className="metric-grid">
         <MetricCard
-          label="Queued verifications"
+          label={dictionary.adminOverview.queuedVerifications}
           value={String(adminOverview.queuedVerifications)}
-          note="Awaiting worker pickup"
+          note={dictionary.adminOverview.queuedVerificationsNote}
         />
         <MetricCard
-          label="Pending payouts"
+          label={dictionary.adminOverview.pendingPayouts}
           value={String(adminOverview.pendingPayouts)}
-          note="Not yet confirmed onchain"
+          note={dictionary.adminOverview.pendingPayoutsNote}
         />
         <MetricCard
-          label="Flagged sessions"
+          label={dictionary.adminOverview.flaggedSessions}
           value={String(adminOverview.flaggedSessions)}
-          note="Needs fraud review"
+          note={dictionary.adminOverview.flaggedSessionsNote}
         />
         <MetricCard
-          label="Reward velocity"
-          value={formatReward(adminOverview.rewardVelocity24h)}
-          note="Last 24h"
+          label={dictionary.adminOverview.rewardVelocity}
+          value={formatReward(adminOverview.rewardVelocity24h, locale)}
+          note={dictionary.adminOverview.rewardVelocityNote}
         />
       </section>
       <ShellCard>
         <div className="stack">
-          <p className="section-eyebrow">Operating assumptions</p>
-          <h3 className="card-title">What the platform protects by design</h3>
+          <p className="section-eyebrow">{dictionary.adminOverview.assumptionsEyebrow}</p>
+          <h3 className="card-title">{dictionary.adminOverview.assumptionsTitle}</h3>
         </div>
         <ul className="architecture-list">
           {architectureSignals.map((signal) => (

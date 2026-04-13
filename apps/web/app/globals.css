@@ -32,6 +32,15 @@ body {
   font-family: var(--font-display), sans-serif;
 }
 
+html[data-locale="ko"] body {
+  font-family:
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    "Segoe UI",
+    sans-serif;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -112,6 +121,53 @@ h4 {
 .ghost-pill {
   border: 1px solid rgba(15, 118, 110, 0.18);
   background: rgba(15, 118, 110, 0.08);
+}
+
+.page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.locale-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.locale-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.locale-options {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.locale-option {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.locale-option.is-active {
+  border-color: rgba(15, 118, 110, 0.16);
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--text);
+}
+
+.locale-option:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .hero-grid,
@@ -368,6 +424,15 @@ h4 {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .page-toolbar {
+    justify-content: stretch;
+  }
+
+  .locale-switcher {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .hero-panel h1,

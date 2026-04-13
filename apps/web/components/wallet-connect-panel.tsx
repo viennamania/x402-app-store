@@ -3,11 +3,16 @@
 import { useEffect, useState } from "react";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
 import { ShellCard } from "@repo/ui";
+import type { Dictionary } from "@/lib/i18n";
 import { defaultChain, supportedWallets, thirdwebClient } from "@/lib/thirdweb";
 
-type LinkStatus = "idle" | "syncing" | "linked" | "error";
+type LinkStatus = keyof Dictionary["walletConnect"]["status"];
 
-export function WalletConnectPanel() {
+export function WalletConnectPanel({
+  copy
+}: {
+  copy: Dictionary["walletConnect"];
+}) {
   const account = useActiveAccount();
   const [status, setStatus] = useState<LinkStatus>("idle");
 
@@ -60,12 +65,9 @@ export function WalletConnectPanel() {
   return (
     <ShellCard className="wallet-connect-panel">
       <div className="stack">
-        <p className="section-eyebrow">Wallet Access</p>
-        <h3>Connect with thirdweb, keep business state off the client.</h3>
-        <p className="muted-copy">
-          The web app only handles wallet UX. Linking, balances, and payout
-          state stay behind the internal API and worker pipeline.
-        </p>
+        <p className="section-eyebrow">{copy.eyebrow}</p>
+        <h3>{copy.title}</h3>
+        <p className="muted-copy">{copy.description}</p>
       </div>
       <ConnectButton
         client={thirdwebClient}
@@ -73,16 +75,16 @@ export function WalletConnectPanel() {
         chain={defaultChain}
       />
       <div className="sync-status">
-        <span>Connection state</span>
+        <span>{copy.connectionState}</span>
         <strong>
           {account?.address
             ? `${account.address.slice(0, 6)}...${account.address.slice(-4)}`
-            : "Not connected"}
+            : copy.notConnected}
         </strong>
       </div>
       <div className="sync-status">
-        <span>Backend link</span>
-        <strong>{status}</strong>
+        <span>{copy.backendLink}</span>
+        <strong>{copy.status[status]}</strong>
       </div>
     </ShellCard>
   );

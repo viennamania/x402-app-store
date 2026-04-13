@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
+import { getRequestDictionary } from "@/lib/i18n";
 import { getMissionDetail } from "@/lib/mock-data";
 
-export default function MissionDetailPage({
+export default async function MissionDetailPage({
   params
 }: {
   params: { missionId: string };
 }) {
-  const detail = getMissionDetail(params.missionId);
+  const { dictionary, locale } = await getRequestDictionary();
+  const detail = getMissionDetail(locale, params.missionId);
 
   if (!detail) {
     notFound();
@@ -18,27 +20,33 @@ export default function MissionDetailPage({
     <div className="page-shell">
       <section className="two-column">
         <div className="hero-panel accent-panel">
-          <p className="section-eyebrow">Mission Detail</p>
+          <p className="section-eyebrow">{dictionary.missionDetail.eyebrow}</p>
           <h1>{detail.mission.title}</h1>
           <p className="hero-copy">{detail.mission.description}</p>
           <div className="chip-row">
             <Pill tone="success">{detail.mission.reward.amount} USDT</Pill>
-            <Pill>{detail.mission.verificationMethod}</Pill>
+            <Pill>
+              {
+                dictionary.taxonomy.verificationMethods[
+                  detail.mission.verificationMethod as keyof typeof dictionary.taxonomy.verificationMethods
+                ]
+              }
+            </Pill>
           </div>
           <div className="hero-actions">
             <Link className="primary-link" href="/wallet">
-              Prepare wallet
+              {dictionary.missionDetail.prepareWallet}
             </Link>
             <Link className="secondary-link" href={`/apps/${detail.app.slug}`}>
-              Back to {detail.app.name}
+              {dictionary.missionDetail.backTo} {detail.app.name}
             </Link>
           </div>
         </div>
         <ShellCard>
           <SectionHeading
-            eyebrow="Proof Contract"
-            title="The request cycle stops at submission."
-            description="Verification and reward credit do not happen inline. A mission session hands off to the queue, then the worker decides whether to credit or flag."
+            eyebrow={dictionary.missionDetail.proofEyebrow}
+            title={dictionary.missionDetail.proofTitle}
+            description={dictionary.missionDetail.proofDescription}
           />
           <div className="timeline">
             {detail.mission.proofRequirements.map((item) => (
@@ -53,43 +61,51 @@ export default function MissionDetailPage({
       <section className="split-grid">
         <ShellCard>
           <SectionHeading
-            eyebrow="Async Stages"
-            title="Verification pipeline"
-            description="This is the operational loop behind a single mission submission."
+            eyebrow={dictionary.missionDetail.asyncEyebrow}
+            title={dictionary.missionDetail.asyncTitle}
+            description={dictionary.missionDetail.asyncDescription}
           />
           <div className="timeline">
             <div className="timeline-step">
-              <strong>1. Session submitted</strong>
-              <p className="detail-copy">Proof is captured and stored for worker pickup.</p>
+              <strong>{dictionary.missionDetail.stageOneTitle}</strong>
+              <p className="detail-copy">{dictionary.missionDetail.stageOneDescription}</p>
             </div>
             <div className="timeline-step">
-              <strong>2. Fraud scoring</strong>
-              <p className="detail-copy">Low confidence sessions divert into manual review.</p>
+              <strong>{dictionary.missionDetail.stageTwoTitle}</strong>
+              <p className="detail-copy">{dictionary.missionDetail.stageTwoDescription}</p>
             </div>
             <div className="timeline-step">
-              <strong>3. Reward credit queued</strong>
-              <p className="detail-copy">Idempotency is keyed to the mission session before the ledger changes.</p>
+              <strong>{dictionary.missionDetail.stageThreeTitle}</strong>
+              <p className="detail-copy">{dictionary.missionDetail.stageThreeDescription}</p>
             </div>
           </div>
         </ShellCard>
         <ShellCard>
           <SectionHeading
-            eyebrow="Runtime Notes"
-            title="Production-minded even while scaffolded."
-            description="The interfaces are explicit so real integrations can replace the mock data without changing the page contracts."
+            eyebrow={dictionary.missionDetail.runtimeEyebrow}
+            title={dictionary.missionDetail.runtimeTitle}
+            description={dictionary.missionDetail.runtimeDescription}
           />
           <div className="stack">
             <div className="sync-status">
-              <span>Estimated effort</span>
-              <strong>{detail.mission.estimatedMinutes} min</strong>
+              <span>{dictionary.missionDetail.estimatedEffort}</span>
+              <strong>
+                {detail.mission.estimatedMinutes} {dictionary.missionDetail.minutesShort}
+              </strong>
             </div>
             <div className="sync-status">
-              <span>Linked app</span>
+              <span>{dictionary.missionDetail.linkedApp}</span>
               <strong>{detail.app.name}</strong>
             </div>
             <div className="sync-status">
-              <span>Status</span>
-              <strong>{detail.mission.status}</strong>
+              <span>{dictionary.missionDetail.status}</span>
+              <strong>
+                {
+                  dictionary.taxonomy.campaignStatuses[
+                    detail.mission.status as keyof typeof dictionary.taxonomy.campaignStatuses
+                  ] ?? detail.mission.status
+                }
+              </strong>
             </div>
           </div>
         </ShellCard>

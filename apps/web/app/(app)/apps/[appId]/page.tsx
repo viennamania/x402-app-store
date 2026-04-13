@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
+import { getRequestDictionary } from "@/lib/i18n";
 import { getStorefrontBySlug } from "@/lib/mock-data";
+import { formatNumber } from "@/lib/formatters";
 
-export default function AppDetailPage({
+export default async function AppDetailPage({
   params
 }: {
   params: { appId: string };
 }) {
-  const entry = getStorefrontBySlug(params.appId);
+  const { dictionary, locale } = await getRequestDictionary();
+  const entry = getStorefrontBySlug(locale, params.appId);
 
   if (!entry) {
     notFound();
@@ -18,7 +21,13 @@ export default function AppDetailPage({
     <div className="page-shell">
       <section className="hero-grid">
         <div className="hero-panel accent-panel">
-          <p className="section-eyebrow">{entry.app.category}</p>
+          <p className="section-eyebrow">
+            {
+              dictionary.taxonomy.categories[
+                entry.app.category as keyof typeof dictionary.taxonomy.categories
+              ]
+            }
+          </p>
           <h1>{entry.app.name}</h1>
           <p className="hero-copy">{entry.app.description}</p>
           <div className="chip-row">
@@ -28,22 +37,22 @@ export default function AppDetailPage({
         </div>
         <ShellCard>
           <SectionHeading
-            eyebrow="Listing Signals"
-            title="Campaign quality is visible before the user starts."
-            description="This page combines mission count, supported regions, reward range, and verification method so the funnel feels intentional."
+            eyebrow={dictionary.appDetail.listingSignalsEyebrow}
+            title={dictionary.appDetail.listingSignalsTitle}
+            description={dictionary.appDetail.listingSignalsDescription}
           />
           <div className="stack">
             <div className="sync-status">
-              <span>Live missions</span>
+              <span>{dictionary.appDetail.liveMissions}</span>
               <strong>{entry.missions.length}</strong>
             </div>
             <div className="sync-status">
-              <span>Rating</span>
+              <span>{dictionary.appDetail.rating}</span>
               <strong>{entry.app.rating.toFixed(1)} / 5</strong>
             </div>
             <div className="sync-status">
-              <span>Install base</span>
-              <strong>{entry.app.installCount.toLocaleString()}</strong>
+              <span>{dictionary.appDetail.installBase}</span>
+              <strong>{formatNumber(entry.app.installCount, locale)}</strong>
             </div>
           </div>
         </ShellCard>
@@ -51,14 +60,20 @@ export default function AppDetailPage({
 
       <section className="stack">
         <SectionHeading
-          eyebrow="Missions"
-          title="Every mission has an explicit proof path."
-          description="The UI can stay simple because verification and reward credit move through the worker pipeline after submission."
+          eyebrow={dictionary.appDetail.missionsEyebrow}
+          title={dictionary.appDetail.missionsTitle}
+          description={dictionary.appDetail.missionsDescription}
         />
         {entry.missions.map((mission) => (
           <ShellCard key={mission.id}>
             <div className="chip-row">
-              <Pill>{mission.verificationMethod}</Pill>
+              <Pill>
+                {
+                  dictionary.taxonomy.verificationMethods[
+                    mission.verificationMethod as keyof typeof dictionary.taxonomy.verificationMethods
+                  ]
+                }
+              </Pill>
               <Pill tone="success">{mission.reward.amount} USDT</Pill>
             </div>
             <div className="stack">
@@ -73,7 +88,7 @@ export default function AppDetailPage({
               ))}
             </div>
             <Link className="primary-link" href={`/missions/${mission.id}`}>
-              Review mission flow
+              {dictionary.appDetail.reviewMissionFlow}
             </Link>
           </ShellCard>
         ))}

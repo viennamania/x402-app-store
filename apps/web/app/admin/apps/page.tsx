@@ -1,31 +1,43 @@
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
-import { storefrontApps } from "@/lib/mock-data";
+import { getRequestDictionary } from "@/lib/i18n";
+import { getStorefrontApps } from "@/lib/mock-data";
 
-export default function AdminAppsPage() {
+export default async function AdminAppsPage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const storefrontApps = getStorefrontApps(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Apps"
-        title="Campaign inventory is organized by app quality and mission depth."
-        description="App approvals and reward budgeting should stay close to the mission inventory each listing can actually sustain."
+        eyebrow={dictionary.adminApps.eyebrow}
+        title={dictionary.adminApps.title}
+        description={dictionary.adminApps.description}
       />
       <section className="admin-grid">
         {storefrontApps.map((entry) => (
           <ShellCard key={entry.app.id}>
             <div className="chip-row">
-              <Pill>{entry.app.category}</Pill>
+              <Pill>
+                {
+                  dictionary.taxonomy.categories[
+                    entry.app.category as keyof typeof dictionary.taxonomy.categories
+                  ]
+                }
+              </Pill>
               <Pill tone={entry.app.featured ? "success" : "default"}>
-                {entry.app.featured ? "featured" : "catalog"}
+                {entry.app.featured
+                  ? dictionary.adminApps.featured
+                  : dictionary.adminApps.catalog}
               </Pill>
             </div>
             <h3 className="card-title">{entry.app.name}</h3>
             <p className="detail-copy">{entry.app.description}</p>
             <div className="sync-status">
-              <span>Missions</span>
+              <span>{dictionary.adminApps.missions}</span>
               <strong>{entry.missions.length}</strong>
             </div>
             <div className="sync-status">
-              <span>Supported regions</span>
+              <span>{dictionary.adminApps.supportedRegions}</span>
               <strong>{entry.app.supportedRegions.length}</strong>
             </div>
           </ShellCard>

@@ -1,23 +1,33 @@
 import Link from "next/link";
 import { Pill, SectionHeading, ShellCard } from "@repo/ui";
-import { storefrontApps } from "@/lib/mock-data";
-import { compact } from "@/lib/formatters";
+import { getRequestDictionary } from "@/lib/i18n";
+import { getStorefrontApps } from "@/lib/mock-data";
+import { formatCompact } from "@/lib/formatters";
 
-export default function StorePage() {
+export default async function StorePage() {
+  const { dictionary, locale } = await getRequestDictionary();
+  const storefrontApps = getStorefrontApps(locale);
+
   return (
     <div className="page-shell">
       <SectionHeading
-        eyebrow="Store"
-        title="Browse reward-backed apps with mission depth, not clickbait."
-        description="Each listing combines discovery, mission inventory, and payout expectations so users can judge whether a campaign is worth the effort."
+        eyebrow={dictionary.store.eyebrow}
+        title={dictionary.store.title}
+        description={dictionary.store.description}
       />
 
       <section className="app-grid">
         {storefrontApps.map(({ app, missions }) => (
           <ShellCard key={app.id}>
             <div className="chip-row">
-              <Pill>{app.category}</Pill>
-              {app.featured ? <Pill tone="success">Featured</Pill> : null}
+              <Pill>
+                {
+                  dictionary.taxonomy.categories[
+                    app.category as keyof typeof dictionary.taxonomy.categories
+                  ]
+                }
+              </Pill>
+              {app.featured ? <Pill tone="success">{dictionary.store.featured}</Pill> : null}
             </div>
             <div className="stack">
               <h2 className="app-card-title">{app.name}</h2>
@@ -25,24 +35,30 @@ export default function StorePage() {
             </div>
             <div className="meta-row">
               <strong>{app.rewardRange}</strong>
-              <span className="mini-label">{missions.length} live missions</span>
+              <span className="mini-label">
+                {missions.length} {dictionary.store.liveMissions}
+              </span>
             </div>
             <div className="meta-row">
-              <strong>{app.rating.toFixed(1)} rating</strong>
+              <strong>
+                {app.rating.toFixed(1)} {dictionary.store.ratingSuffix}
+              </strong>
               <span className="mini-label">
-                {compact.format(app.installCount)} installs
+                {formatCompact(app.installCount, locale)} {dictionary.store.installs}
               </span>
             </div>
             <div className="timeline">
               {missions.slice(0, 2).map((mission) => (
                 <div className="timeline-step" key={mission.id}>
                   <strong>{mission.title}</strong>
-                  <p className="detail-copy">{mission.reward.amount} USDT reward</p>
+                  <p className="detail-copy">
+                    {mission.reward.amount} {dictionary.store.rewardSuffix}
+                  </p>
                 </div>
               ))}
             </div>
             <Link className="primary-link" href={`/apps/${app.slug}`}>
-              Open listing
+              {dictionary.store.openListing}
             </Link>
           </ShellCard>
         ))}

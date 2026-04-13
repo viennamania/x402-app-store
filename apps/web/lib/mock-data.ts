@@ -8,6 +8,7 @@ import type {
   WalletMovementRecord,
   WalletSummaryDto
 } from "@repo/types";
+import { getDictionary, type Locale } from "@/lib/i18n";
 
 const appCatalog: AppRecord[] = [
   {
@@ -111,12 +112,7 @@ const missionCatalog: MissionRecord[] = [
   }
 ];
 
-export const storefrontApps: StorefrontAppDto[] = appCatalog.map((app) => ({
-  app,
-  missions: missionCatalog.filter((mission) => mission.appId === app.id)
-}));
-
-export const walletSummary: WalletSummaryDto = {
+const walletSummaryBase: WalletSummaryDto = {
   available: { amount: 124.8, currency: "USDT" },
   pending: { amount: 18, currency: "USDT" },
   lifetimeEarned: { amount: 480.6, currency: "USDT" },
@@ -154,7 +150,7 @@ export const adminOverview: AdminOverviewDto = {
   rewardVelocity24h: 3620
 };
 
-export const campaigns: CampaignRecord[] = [
+const campaignsBase: CampaignRecord[] = [
   {
     id: "campaign_pulse_q2",
     appId: "app_pulseplay",
@@ -201,7 +197,7 @@ export const payoutQueue: WalletMovementRecord[] = [
   }
 ];
 
-export const fraudQueue = [
+const fraudQueueBase = [
   {
     missionSessionId: "session_demo_003",
     score: 72,
@@ -216,19 +212,104 @@ export const fraudQueue = [
   }
 ];
 
-export const architectureSignals = [
-  "Queue every reward credit before any balance projection changes.",
-  "Treat reward_ledger as source-of-truth and balance snapshots as derived state.",
-  "Keep wallet UX client-side, but link state and payouts server-owned."
-];
+function localizeApp(locale: Locale, app: AppRecord): AppRecord {
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.data.apps[app.id as keyof typeof dictionary.data.apps];
 
-export function getStorefrontBySlug(slugOrId: string) {
-  return storefrontApps.find(
+  if (!copy) {
+    return app;
+  }
+
+  return {
+    ...app,
+    tagline: copy.tagline,
+    description: copy.description
+  };
+}
+
+function localizeMission(locale: Locale, mission: MissionRecord): MissionRecord {
+  const dictionary = getDictionary(locale);
+  const copy =
+    dictionary.data.missions[
+      mission.id as keyof typeof dictionary.data.missions
+    ];
+
+  if (!copy) {
+    return mission;
+  }
+
+  return {
+    ...mission,
+    title: copy.title,
+    description: copy.description,
+    proofRequirements: [...copy.proofRequirements]
+  };
+}
+
+export function getStorefrontApps(locale: Locale): StorefrontAppDto[] {
+  return appCatalog.map((app) => {
+    const localizedApp = localizeApp(locale, app);
+    const localizedMissions = missionCatalog
+      .filter((mission) => mission.appId === app.id)
+      .map((mission) => localizeMission(locale, mission));
+
+    return {
+      app: localizedApp,
+      missions: localizedMissions
+    };
+  });
+}
+
+export function getWalletSummary(locale: Locale): WalletSummaryDto {
+  const dictionary = getDictionary(locale);
+
+  return {
+    ...walletSummaryBase,
+    nextPayoutEta: dictionary.data.wallet.nextPayoutEta,
+    recentMovements: walletSummaryBase.recentMovements.map((movement) => ({
+      ...movement
+    }))
+  };
+}
+
+export function getCampaigns(locale: Locale): CampaignRecord[] {
+  const dictionary = getDictionary(locale);
+
+  return campaignsBase.map((campaign) => ({
+    ...campaign,
+    name:
+      dictionary.data.campaigns[
+        campaign.id as keyof typeof dictionary.data.campaigns
+      ] ?? campaign.name
+  }));
+}
+
+export function getFraudQueue(locale: Locale) {
+  const dictionary = getDictionary(locale);
+
+  return fraudQueueBase.map((item) => ({
+    ...item,
+    reason:
+      dictionary.data.fraudReasons[
+        item.missionSessionId as keyof typeof dictionary.data.fraudReasons
+      ] ?? item.reason
+  }));
+}
+
+export function getArchitectureSignals(locale: Locale) {
+  return [...getDictionary(locale).data.architectureSignals];
+}
+
+export function getStorefrontBySlug(locale: Locale, slugOrId: string) {
+  return getStorefrontApps(locale).find(
     (entry) => entry.app.slug === slugOrId || entry.app.id === slugOrId
   );
 }
 
-export function getMissionDetail(missionId: string): MissionDetailDto | null {
+export function getMissionDetail(
+  locale: Locale,
+  missionId: string
+): MissionDetailDto | null {
   const mission = missionCatalog.find((entry) => entry.id === missionId);
 
   if (!mission) {
@@ -241,13 +322,16 @@ export function getMissionDetail(missionId: string): MissionDetailDto | null {
     return null;
   }
 
+  const localizedMission = localizeMission(locale, mission);
+  const localizedApp = localizeApp(locale, app);
+
   return {
-    mission,
+    mission: localizedMission,
     app: {
-      id: app.id,
-      name: app.name,
-      slug: app.slug,
-      tagline: app.tagline
+      id: localizedApp.id,
+      name: localizedApp.name,
+      slug: localizedApp.slug,
+      tagline: localizedApp.tagline
     }
   };
 }
