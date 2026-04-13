@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>X402 Offline</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f0e6;
+        --card: rgba(255, 249, 239, 0.94);
+        --stroke: rgba(19, 33, 28, 0.12);
+        --text: #13211c;
+        --muted: #5b6d65;
+        --brand: #0f766e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at top left, rgba(14, 116, 110, 0.24), transparent 32%),
+          radial-gradient(circle at top right, rgba(224, 143, 56, 0.2), transparent 30%),
+          linear-gradient(180deg, #f7f0e6 0%, #efe5d3 100%);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .card {
+        width: min(100%, 520px);
+        padding: 28px;
+        border: 1px solid var(--stroke);
+        border-radius: 28px;
+        background: var(--card);
+        box-shadow: 0 24px 80px rgba(18, 31, 25, 0.12);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        font-size: 0.8rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--brand);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 10vw, 3rem);
+        line-height: 0.98;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">Offline</p>
+      <h1>You are offline now.</h1>
+      <p>
+        The app will load saved pages when possible. Reconnect to refresh balances,
+        tasks, and payout status.
+      </p>
+    </main>
+  </body>
+</html>

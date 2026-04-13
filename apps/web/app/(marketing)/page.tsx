@@ -52,9 +52,11 @@ export default async function LandingPage() {
             description={dictionary.landing.scaffoldDescription}
           />
           <div className="chip-row">
-            <Pill tone="success">Next.js App Router</Pill>
-            <Pill tone="success">BullMQ workers</Pill>
-            <Pill tone="warning">Ledger-first payouts</Pill>
+            {dictionary.landing.highlights.map((highlight) => (
+              <Pill key={highlight} tone="success">
+                {highlight}
+              </Pill>
+            ))}
           </div>
           <div className="timeline">
             {architectureSignals.map((signal) => (

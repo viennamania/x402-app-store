@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { MobileTabBar } from "@/components/mobile-tab-bar";
 import type { Dictionary, Locale } from "@/lib/i18n";
 
 type ShellProps = {
@@ -18,13 +19,20 @@ export function AppShell({ children, dictionary, locale }: ShellProps) {
   ];
 
   return (
-    <div className="shell-frame">
+    <div className="shell-frame has-mobile-tabbar">
       <header className="topbar">
-        <Link className="brandmark" href="/">
-          X402
-          <span>{dictionary.brand.storefront}</span>
-        </Link>
-        <nav className="topnav">
+        <div className="topbar-main">
+          <Link className="brandmark" href="/">
+            X402
+            <span>{dictionary.brand.storefront}</span>
+          </Link>
+          <LocaleSwitcher
+            label={dictionary.language.label}
+            locale={locale}
+            options={dictionary.language.options}
+          />
+        </div>
+        <nav className="topnav topnav-desktop">
           {storeNav.map((item) => (
             <Link key={item.href} href={item.href}>
               {item.label}
@@ -33,14 +41,10 @@ export function AppShell({ children, dictionary, locale }: ShellProps) {
           <Link className="ghost-pill" href="/admin">
             {dictionary.nav.admin}
           </Link>
-          <LocaleSwitcher
-            label={dictionary.language.label}
-            locale={locale}
-            options={dictionary.language.options}
-          />
         </nav>
       </header>
       <main className="page-shell">{children}</main>
+      <MobileTabBar items={storeNav} />
     </div>
   );
 }
@@ -57,11 +61,18 @@ export function AdminShell({ children, dictionary, locale }: ShellProps) {
   return (
     <div className="shell-frame admin-frame">
       <header className="topbar">
-        <Link className="brandmark" href="/admin">
-          X402 Ops
-          <span>{dictionary.brand.controlPlane}</span>
-        </Link>
-        <nav className="topnav">
+        <div className="topbar-main">
+          <Link className="brandmark" href="/admin">
+            X402 Ops
+            <span>{dictionary.brand.controlPlane}</span>
+          </Link>
+          <LocaleSwitcher
+            label={dictionary.language.label}
+            locale={locale}
+            options={dictionary.language.options}
+          />
+        </div>
+        <nav className="topnav topnav-desktop">
           {adminNav.map((item) => (
             <Link key={item.href} href={item.href}>
               {item.label}
@@ -70,14 +81,10 @@ export function AdminShell({ children, dictionary, locale }: ShellProps) {
           <Link className="ghost-pill" href="/store">
             {dictionary.nav.storefront}
           </Link>
-          <LocaleSwitcher
-            label={dictionary.language.label}
-            locale={locale}
-            options={dictionary.language.options}
-          />
         </nav>
       </header>
       <main className="page-shell">{children}</main>
+      <MobileTabBar items={adminNav} />
     </div>
   );
 }
